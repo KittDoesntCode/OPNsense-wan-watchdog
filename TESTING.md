@@ -1,31 +1,19 @@
-# Validation and production release gate
+# Simplified implementation validation
 
-## Executed in this change set
+Executed in a Linux sandbox: 26 unittest methods (including parameterized failures),
+repeated 10 times; Python compilation; wrapper shell syntax; retired configd INI parse.
+Tests use real SQLite transactions, concurrency and kernel locks; a fake curl process
+checks the stdin/response contract. No real credentials, network calls or interface resets.
+The tests explicitly check no worker/sleep for an empty queue, no delivery spawn on a
+healthy event, no gateway query when recovery is disabled, bounded unknown-data grace,
+and release of the worker lock before the empty-queue transaction commits.
 
-- Restored the exact helper committed on dev; Git blob SHA verified against
-  e89c4bba02cf29f89e0b91b5faabf27583b0d8a7 before testing integration.
-- 31 repository test methods, including parameterized fault/input cases, pass.
-  Ten consecutive runs: 310 test-method executions.
-- Python compilation and sh -n for all three hooks pass.
-- CI YAML/configd INI structure validated locally, not on native configd.
-- Tests exercise real SQLite/locking/concurrency and a fake transport subprocess;
-  pluginctl/configctl/Pushover are mocked. No real credentials or resets used.
-- This checked-in suite groups related cases; the earlier 55-method draft suite
-  was not committed. Counts refer to this exact retained suite, not the old draft.
-- Linux sandbox only. ShellCheck unavailable. CI has not run before commit.
+Native FreeBSD/OPNsense, actual Pushover receipt, WAN/DNS failover, power-loss persistence,
+physical recovery and CPU/memory/I/O benchmarking have NOT been executed. ShellCheck
+is unavailable. CI results are not claimed before the workflow runs on this commit.
 
-## Required before production approval (not yet executed)
-
-1. Run this suite on the target FreeBSD/OPNsense Python/SQLite build.
-2. Verify executable paths, config ownership/mode, expected gateways and exact
-   gateway-to-logical-interface associations.
-3. Verify configd registration and every-minute Cron execution.
-4. With recovery disabled, verify real API acceptance and actual device receipt.
-5. In an authorized maintenance window with console access: failed delivery then
-   outage/recovery ordering, DNS/WAN failover, worker interruption and reboot persistence.
-6. If source_ipv4 is enabled, packet-capture the path and validate DHCP address changes.
-7. Separately enable recovery and validate cooldown, exact-down action, unavailable
-   monitor behavior, administrative force-down and maximum attempt budget.
-8. Verify protected backup and complete rollback.
-
-No green local test run certifies physical WAN recovery or production readiness.
+Before production: run the suite on the target, verify logical interface mappings and
+permissions, remove the old dev cron/action if installed, test real notification delivery
+with recovery disabled, then validate authorized outage/recovery with console access.
+Test interrupted-worker restart, reboot queue retention and rollback. Only then enable
+recovery. No guaranteed alert is possible without a working Internet/DNS path.

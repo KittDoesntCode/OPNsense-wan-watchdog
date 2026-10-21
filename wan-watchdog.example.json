@@ -7,6 +7,5 @@
     "TMOBILE_GW": null
   },
   "recovery_enabled": false,
-  "boot_delay": 90,
-  "source_ipv4": ""
+  "boot_delay": 90
 }
