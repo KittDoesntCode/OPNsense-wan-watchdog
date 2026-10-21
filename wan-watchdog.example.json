@@ -1,0 +1,12 @@
+{
+  "app_token": "REPLACE_WITH_30_CHARACTER_TOKEN",
+  "user_key": "REPLACE_WITH_30_CHARACTER_USER_KEY",
+  "gateways": {
+    "SPECTRUM_GW": null,
+    "STARLINK_GW": null,
+    "TMOBILE_GW": null
+  },
+  "recovery_enabled": false,
+  "boot_delay": 90,
+  "source_ipv4": ""
+}
